@@ -1,0 +1,43 @@
+
+{% extends 'base.html'%}
+
+{% block content %}  
+
+{% load bootstrap4 %}
+<button btn btn-success><a href="{% url 'books' %}">Upload a Book</a></button>
+
+<body>
+
+
+        <div class="container">
+
+          <!--Django Form-->
+
+
+        <!--Django Model-->
+        <h2 class="text-center">Books</h2>
+        <div class="row">
+          {% for m in books %}
+          <div class="col-lg-4 col-md-6 col-sm-12 pb-4">
+            <div class="card h-100 p-4">
+                <h3>Title: {{m.title}}</h3>
+              <img src="{{ m.image.url }}" class="card-img-top">
+              
+              <p>Year published: {{m.year_published}}</p>
+              <p>Author: {{m.author}}</p>
+              <p>Price: ${{m.price}}</p>
+              <a href="/media/{{m.file}}">View Script</a>
+            </div>
+          </div>
+          {% empty %}
+          <p>No books added.</p>
+          {% endfor %}
+        </div>
+
+      </div>
+    
+    </body>
+
+
+    
+{% endblock %}

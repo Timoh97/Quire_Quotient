@@ -1,0 +1,54 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-info">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">Zen</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'index' %}">BookStore<span class="sr-only">(current)</span></a>
+      </li>
+ 
+    </ul>
+    <div class="form-inline my-2 my-lg-0">
+      {% if user.is_authenticated%}
+        <li class="nav-item dropdown list-unstyled">
+            <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">{{ user.username|title }} <img class="rounded-circle nav-img"
+                                                                    src="{#{{ user.profile.profile_picture.url }}#}"
+                                                                    alt="">
+            </a>
+            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item text-center" href="{#{% url 'customer' user.username %}#}">Profile</a>
+                <hr>
+                <a class="dropdown-item text-center" href="{#{% url 'edit' user.username  %}#}"> Edit profile</a>
+                <hr>
+                <a href="{% url 'logout' %}" class="text-secondary text-center dropdown-item">Log Out</a>
+
+
+            </div> 
+        </li>
+        <span>
+          <button class="btn btn-outline-light btn-sm" id="site" data-toggle="modal" data-target=".bd-example-modal-xl">
+            POST YOUR BOOK
+        </button>
+        </span>
+        {% else %}
+        <a href="{% url 'login' %}"class="btn btn-light">Login</a>
+
+        
+        {% endif %}
+        <a href="{% url 'cart' %}">
+          <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+        </a>
+        <p id="cart-total">{{cartItems}}</p>
+    </div>
+    
+    
+  </div>
+  </div> 
+</nav>
