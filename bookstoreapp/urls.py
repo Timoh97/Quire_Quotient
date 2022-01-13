@@ -23,6 +23,7 @@ urlpatterns = [
     
     #ordersystem
     path('', views.index, name="index"),
+    
 	path('cart/', views.cart, name="cart"),
 	path('checkout/', views.checkout, name="checkout"),
 	path('update_item/', views.updateItem, name="update_item"),
