@@ -113,7 +113,7 @@ from .utils import cookieCart, cartData, guestOrder
 # REVIEW
 
 def reviews(request):
-    
+    products = Product.objects.all()
    
     return render(request,"review.html",{'products':products})
 
