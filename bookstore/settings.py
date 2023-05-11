@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-import django_heroku
-import dj_database_url
+
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -94,8 +93,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bookstoreapp',
-        'USER': 'moringa',
-    'PASSWORD':'12345',
+        'USER': 'tim',
+    'PASSWORD':'P@ssword',
     }
 }
 
@@ -110,8 +109,8 @@ EMAIL_HOST_PASSWORD=''
 
 
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+# db_from_env = dj_database_url.config(conn_max_age=500)
+# DATABASES['default'].update(db_from_env)
 
 ALLOWED_HOSTS = []
 
@@ -203,4 +202,4 @@ LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
 # Configure Django App for Heroku.
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
