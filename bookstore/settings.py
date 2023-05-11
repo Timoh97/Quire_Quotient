@@ -83,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'bookstore.wsgi.application'
+# WSGI_APPLICATION = 'bookstore.wsgi.application'
 
 
 # Database
@@ -112,7 +112,7 @@ EMAIL_HOST_PASSWORD=''
 # db_from_env = dj_database_url.config(conn_max_age=500)
 # DATABASES['default'].update(db_from_env)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 cloudinary.config(
