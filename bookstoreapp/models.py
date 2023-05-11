@@ -38,16 +38,61 @@ from cloudinary.models import CloudinaryField
     
     
     #ordersystem
+class Profile(models.Model):
+  profile_photo= CloudinaryField('image')
+  bio = models.TextField()
+  username = models.CharField(max_length=200, unique=True)
+  email = models.EmailField(max_length=30)
+  phone_no = models.IntegerField(blank=False)
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  date = models.DateTimeField(auto_now_add=True)
+  modified = models.DateTimeField(auto_now=True)
+  
+  def save_user(self):
+        self.save()
+  def update_user(self):
+        self.update()
+  def delete_user(self):
+        self.delete()
+  
+  def __str__(self):
+    return f'{self.user}'
+
+#add author table
+class Author(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,null=True,blank=True)
+    username = models.CharField(max_length=200, null=True)
+    fname = models.CharField(max_length=200, null=True)
+    lname = models.CharField(max_length=200, null=True)
+    email = models.CharField(max_length=200)
+    book_authored = models.CharField(max_length=200, blank=False, unique=True)
+
+    def save_author(self):
+        self.save()
+    def update_author(self):
+        self.update()
+    def delete_author(self):
+        self.delete()
+        
+    def __str__(self):
+      return f'{self.user}'
 class Customer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,null=True,blank=True)
-    name = models.CharField(max_length=200, null=True)
+    username = models.CharField(max_length=200, null=True)
+    fname = models.CharField(max_length=200, null=True)
+    lname = models.CharField(max_length=200, null=True)
     email = models.CharField(max_length=200)
 
-    def __str__(self):
-      return self.name
 
     def save_customer(self):
-        self.user
+        self.save()
+    def update_customer(self):
+        self.update()
+    def delete_customer(self):
+        self.delete()
+        
+    def __str__(self):
+      return f'{self.user}'
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -65,6 +110,9 @@ class Product(models.Model):
     @property
     def save_image(self):
           self.save()
+          
+    def update_image(self):
+        self.update()
 
     def delete_image(self):
         self.delete()
