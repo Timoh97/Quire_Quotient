@@ -144,6 +144,8 @@ AUTH_PASSWORD_VALIDATORS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+AUTH_USER_MODEL = 'bookstoreapp.User'
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -198,9 +200,16 @@ REST_FRAMEWORK = {
     )
 }
 
-LOGIN_REDIRECT_URL = 'index'
+# LOGIN_REDIRECT_URL = 'index'
 
-LOGOUT_REDIRECT_URL = 'index'
+# LOGOUT_REDIRECT_URL = 'index'
+LOGIN_URL = 'login'
+
+LOGOUT_URL = 'logout'
+
+LOGIN_REDIRECT_URL = '/'
+
+LOGOUT_REDIRECT_URL = '/'
 
 # Configure Django App for Heroku.
 # django_heroku.settings(locals())
