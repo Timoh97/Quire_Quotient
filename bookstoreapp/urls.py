@@ -19,7 +19,7 @@ urlpatterns = [
     # REVIEWS
     path('reviews/', views.reviews,name="reviews"),
     path("profile/", views.profile, name="profile"),
-    path("profile/update/", views.update_profile, name="update_profile"),
+    path("profile/update/<int:id>", views.update_profile, name="update_profile"),
     path('institution/profile/', views.institution_profile, name='institution_profile'),
     path('author/profile/', views.author_profile, name='author_profile'),
     path('customer/profile/', views.customer_profile, name='customer_profile'),

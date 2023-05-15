@@ -208,6 +208,7 @@
                                     <th scope="col">Photo</th>
                                     <th scope="col">Title</th>
                                     <th scope="col">View</th>
+                                    <th scope="col">Price</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -217,9 +218,11 @@
                                     <th scope="row">
                                         <img src="{{ image.image.url }}" class="border-radius-around" alt="Image">
                                     </th>
-                                    <td>{{ image.title }}</td>
+                                    <td>{{ image.product_name }}</td>
                                     <td><a href="{{ image.url }}" target="_blank" class="text-primary" rel="noopener noreferrer">View
-                                            Site</a></td>
+                                            Site</a>
+                                        </td>
+                                        <td>{{image.price}}</td>
                                     <td>
                                         <!-- view button -->
                                         <a class="text-primary m-3" href="">

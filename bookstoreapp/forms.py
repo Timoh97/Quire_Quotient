@@ -61,7 +61,10 @@ class CustomerSignUpForm(UserCreationForm):
         customer.phone_no = self.cleaned_data.get('phone_no')
         customer.email = self.cleaned_data.get('email')
         return user
-    
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ["profile_photo","bio","phone_no","first_name","last_name"]
     #institution registration form
 class InstitutionSignUpForm(UserCreationForm):
     institution_name= forms.CharField(error_messages={'required': 'Please enter the institution name'})

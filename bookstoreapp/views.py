@@ -159,52 +159,22 @@ def institution_profile(request):
 def profile(request):  # view profile
     current_user = request.user
     profile = Profile.objects.filter(user_id=current_user.id).first()  # get profile
-    # project = Project.objects.filter(user_id=current_user.id).all()  # get all projects
-    return render(request, "profile.html", {"profile": profile})
-def update_profile(request):
+    product = Product.objects.filter(author=current_user.author).all()  # get all projects
+    return render(request, "profile.html", {"profile": profile,"image": product})
+def update_profile(request,id):
+    user = User.objects.get(id=id)
+    profile = Profile.objects.get(user = user)
+    form = UpdateProfileForm(instance=profile)
     if request.method == "POST":
-
-        current_user = request.user
-
-        first_name = request.POST["first_name"]
-        last_name = request.POST["last_name"]
-        username = request.POST["username"]
-        email = request.POST["email"]
-
-        bio = request.POST["bio"]
-        contact = request.POST["contact"]
-
-        profile_image = request.FILES["profile_pic"]
-        profile_image = cloudinary.uploader.upload(profile_image)
-        profile_url = profile_image["url"]
-
-        user = User.objects.get(id=current_user.id)
-
-        # check if user exists in profile table and if not create a new profile
-        if Profile.objects.filter(user_id=current_user.id).exists():
-
-            profile = Profile.objects.get(user_id=current_user.id)
-            profile.profile_photo = profile_url
-            profile.bio = bio
-            profile.contact = contact
-            profile.save()
-        else:
-            profile = Profile(
-                user_id=current_user.id,
-                profile_photo=profile_url,
-                bio=bio,
-                contact=contact,
-            )
-            profile.save_profile()
-
-        user.first_name = first_name
-        user.last_name = last_name
-        user.username = username
-        user.email = email
-
-        user.save()
-
-        return redirect("/profile", {"success": "Profile Updated Successfully"})
+            form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
+            if form.is_valid():  
+                
+                profile = form.save(commit=False)
+                profile.save()
+                return redirect('profile') 
+            
+    ctx = {"form":form}
+    return render(request, 'update_profile.html', ctx)
 
 
 
