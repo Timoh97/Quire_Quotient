@@ -7,109 +7,279 @@ from .models import *
 
 #AUTHENTICATION
 from django.shortcuts import render,redirect
-from django.contrib.auth import login,authenticate
+from django.contrib.auth import login, logout,authenticate
 from django.contrib import messages
 from django.conf import settings
 from django.core.mail import send_mail
 from .forms import *
-from. decorators import author_required
+from. decorators import *
+from django.contrib.auth.decorators import *
+from django.contrib.auth.decorators import login_required
 
 #ordersystem
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, Http404,HttpResponseRedirect, JsonResponse
 from django.http import JsonResponse
-
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 import json
 import datetime
 from .models import *
-
+from .forms import *
 from .utils import cookieCart, cartData, guestOrder
 
 
 
-# Create your views here.
+def signup(request):
+    '''View function to present users with account choices'''
+    title = 'Sign Up'
+    return render(request,'registration/signup.html',{'title': title})
+
+#customer signup
+def customer_signup(request):
+    '''View function to sign up as a customer'''
+    
+    if request.method == 'POST':
+        form = CustomerSignUpForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            email = form.cleaned_data['email']
+            # user = authenticate(username=username, email= email, password=raw_password)
+            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+            
+            # subject = 'Welcome to the Zen Bookstore!'
+            # message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nRemember to enjoy the app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            # email_from = settings.EMAIL_HOST_USER
+            # recepient_list = [user.email]
+            # send_mail(subject,message,email_from,recepient_list)
+            messages.success(request, 'Account created successfully! Check your email for a welcome mail.')
+
+            return redirect('/login')
+    else:
+        form= CustomerSignUpForm()
+
+    # title = 'Welcome, we hold you in high esteem'
+    return render(request,'registration/signup_form.html',{'form':form}) #change template
 
 
-# def upload(request):
-# 	if request.method == "POST":
-# 		form = BookForm(request.POST, request.FILES)
-# 		if form.is_valid():
-# 			form.save()
-# 		return redirect("/")
-# 	form = BookForm()
-# 	books = Books.objects.all()
-# 	return render(request=request, template_name="upload.html", context={'form':form, 'books':books})
-
-# def books(request):
-#     if request.method == "POST":
-#         form = BookForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             project = form.save(commit=False)
-#             project.save()
-#         return redirect('/')
-#     else:
-#         form = BookForm()
+def author_signup(request):
+    if request.method == 'POST':
+        form = AuthorSignUpForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            email = form.cleaned_data['email']
+            # user = authenticate(username=username,email=email, password=raw_password)
+            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+            # subject = 'Welcome to the Zen Bookstore!'
+            # message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nFeel free to sell your books with us!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            # email_from = settings.EMAIL_HOST_USER
+            # recepient_list = [user.email]
+            # send_mail(subject,message,email_from,recepient_list)
+            messages.success(request, f'Your account has been created! You are now able to log in as {username}.')
+            return redirect('login')
+    else:
+        form = AuthorSignUpForm()
         
-#     return render(request, 'books.html', {"form": form})
+    return render(request, 'registration/register.html', {'form':form}) #check template
 
 
-#AUTHENTICATION
-# def signup(request):
-#     '''View function to present users with account choices'''
-#     title = 'Sign Up'
-#     return render(request,'registration/signup.html',{'title': title})
-
-# def customer_signup(request):
-#     '''View function to sign up as a customer'''
-#     if request.method == 'POST':
-#         form = CustomerSignUp(request.POST)
-#         import pdb; pdb.set_trace()
-#         if form.is_valid():
-#             user = form.save()
-#             unhashed_password= form.cleaned_data.get('password1')
-#             user = authenticate(username=user.username, password=unhashed_password)
-#             login(request, user)
-#             subject = 'Welcome to the BOOKSTORE!'
-#             message = f'Hi {user.first_name},\nThe Bookstore would like to officially welcome you to our growing community. Browse the selection of books and find out all your reading tastes, see what you would like to purchase, and place your order.\nRemember to enjoy the app!\n\nKind Regards,\nThe Bookstore Management.'
-#             email_from = settings.EMAIL_HOST_USER
-#             recepient_list = [user.email,]
-#             send_mail(subject,message,email_from,recepient_list)
-#             messages.success(request, 'Account created successfully! Check your email for a welcome mail.')
-
-#             return redirect('index')
-#     else:
-#         form= CustomerSignUp()
-
-#     title = 'Customer Sign Up'
-#     return render(request,'registration/signup_form.html',{'title': title,'form':form})
-
-# def author_signup(request):
-#     '''View function to sign up as an author'''
-#     if request.method == 'POST':
-#         form = AuthorSignUp(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             unhashed_password= form.cleaned_data.get('password1')
-#             user = authenticate(username=user.username, password=unhashed_password)
-#             login(request, user)
-#             subject = 'Welcome to the BOOKSTORE!'
-#             message = f'Hi {user.first_name},\nThe Bookstore would like to officially welcome you to our growing author community. Upload your books and have users browse the selection of books, view your uploaded book, and place their order.\nRemember to enjoy the app!\n\nKind Regards,\nThe Bookstore Management.'
-#             email_from = settings.EMAIL_HOST_USER
-#             recepient_list = [user.email,]
-#             send_mail(subject,message,email_from,recepient_list)
-#             messages.success(request, 'Account created successfully! Check your email for a welcome mail.')
-
-#             return redirect('index')
-#     else:
-#         form= AuthorSignUp()
-
-#     title = 'Author Sign Up'
-#     return render(request,'registration/signup_form.html',{'title': title,'form':form})
+def institution_signup(request):
+    if request.method == 'POST':
+        form = InstitutionSignUpForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            username = form.cleaned_data.get('username')
+            email = form.cleaned_data['email']
+            raw_password = form.cleaned_data.get('password1')
+            # user = authenticate(username=username,email=email, password=raw_password)
+            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+            # subject = 'Welcome to the Zen Bookstore!'
+            # message = f'Hi {user.username},\nWe value institutions like yours and welcome you to our growing community.\nYou can purchase books in our app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            # email_from = settings.EMAIL_HOST_USER
+            # recepient_list = [user.email]
+            # send_mail(subject,message,email_from,recepient_list)
+            messages.success(request, f'Your account has been created! You are now able to log in {username}.')
+            return redirect('login')
+    else:
+        form = InstitutionSignUpForm()
+        title = 'Welcome, we hold you in high esteem'
+    return render(request, 'registration/register.html', {'title': title,'form':form}) #check template
 
 
+def login_view(request):
+	if request.method == "POST":
+		form = LoginForm(request.POST)
+		if form.is_valid():
+			username = form.cleaned_data.get('username')
+			password = form.cleaned_data.get('password')
+			user = authenticate(username=username, password=password)
+			if user is not None:
+				login(request, user)
+				messages.info(request, f"You are now logged in as {username}.")
+				return redirect("/")
+			else:
+				messages.error(request,"Invalid username or password.")
+		else:
+			messages.error(request,"Invalid username or password.")
+	form = LoginForm()
+	return render(request=request, template_name="login.html", context= {"form":form}) #changetemplate
+
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+
+
+#profiles
+
+@customer_required(login_url = 'login')
+def customer_profile(request):
+    current_user = request.user
+    profile = Customer.objects.get(user_id=current_user.id).first()
+    return render(request, "profile.html", {"profile": profile})
+
+@author_required(login_url = 'login')
+def author_profile(request):
+    current_user = request.user
+    profile = Author.objects.filter(user_id=current_user.id).first()
+    return render(request, "profile.html", {"profile": profile})
+
+
+@institution_required(login_url = 'login')
+def institution_profile(request):
+    current_user = request.user
+    profile = Institution.objects.filter(user_id=current_user.id).first()
+    return render(request, "profile.html", {"profile": profile}) #change template
+
+
+def profile(request):  # view profile
+    current_user = request.user
+    profile = Profile.objects.filter(user_id=current_user.id).first()  # get profile
+    # project = Project.objects.filter(user_id=current_user.id).all()  # get all projects
+    return render(request, "profile.html", {"profile": profile})
+def update_profile(request):
+    if request.method == "POST":
+
+        current_user = request.user
+
+        first_name = request.POST["first_name"]
+        last_name = request.POST["last_name"]
+        username = request.POST["username"]
+        email = request.POST["email"]
+
+        bio = request.POST["bio"]
+        contact = request.POST["contact"]
+
+        profile_image = request.FILES["profile_pic"]
+        profile_image = cloudinary.uploader.upload(profile_image)
+        profile_url = profile_image["url"]
+
+        user = User.objects.get(id=current_user.id)
+
+        # check if user exists in profile table and if not create a new profile
+        if Profile.objects.filter(user_id=current_user.id).exists():
+
+            profile = Profile.objects.get(user_id=current_user.id)
+            profile.profile_photo = profile_url
+            profile.bio = bio
+            profile.contact = contact
+            profile.save()
+        else:
+            profile = Profile(
+                user_id=current_user.id,
+                profile_photo=profile_url,
+                bio=bio,
+                contact=contact,
+            )
+            profile.save_profile()
+
+        user.first_name = first_name
+        user.last_name = last_name
+        user.username = username
+        user.email = email
+
+        user.save()
+
+        return redirect("/profile", {"success": "Profile Updated Successfully"})
+
+
+
+#updating profiles
+def update_customer_profile(request):
+  if request.method == 'POST':
+    # user_form = UpdateUserProfile(request.POST,request.FILES,instance=request.user)
+    form = UpdateCustomerProfileForm(request.POST,request.FILES,instance=request.user)
+    if form.is_valid():
+    #   user_form.save()
+      form.save()
+      messages.success(request,'Your Profile account has been updated successfully')
+      return redirect('profile')
+  else:
+    # user_form = UpdateUserProfile(instance=request.user)
+    form = UpdateCustomerProfileForm(instance=request.user) 
+  params = {
+    # 'user_form':user_form,
+    'form':form
+  }
+  return render(request,'edit_profile.html',params) #change template
+
+
+def update_author_profile(request):
+    if request.method == 'POST':
+        # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
+        p_form = UpdateAuthorProfileForm(request.POST, instance=request.user)
+        if p_form.is_valid():
+            # u_form.save()
+            p_form.save()
+            messages.success(
+                request, 'Your Profile account has been updated successfully')
+            return redirect('profile')
+    else:
+        # u_form = UpdateUserProfile(instance=request.user)
+        p_form = UpdateAuthorProfileForm(instance=request.user)
+    context = {
+        # 'u_form': u_form,
+        'p_form': p_form
+    }
+    return render(request,'staff_profile.html',context) #change template
+
+def update_institution_profile(request):
+    if request.method == 'POST':
+        # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
+        p_form = UpdateInstitutionProfileForm(request.POST, instance=request.user)
+        if p_form.is_valid():
+            # u_form.save()
+            p_form.save()
+            messages.success(
+                request, 'Your Profile account has been updated successfully')
+            return redirect('profile')
+    else:
+        # u_form = UpdateUserProfile(instance=request.user)
+        p_form = UpdateInstitutionProfileForm(instance=request.user)
+    context = {
+        # 'u_form': u_form,
+        'p_form': p_form
+    }
+    return render(request,'staff_profile.html',context) #change template
+
+# @login_required
+# def update_profile(request,id):
+#     user = User.objects.get(id=id)
+#     profile = Profile.objects.get(user_id = user)
+#     form = UpdateProfileForm(instance=profile)
+#     if request.method == "POST":
+#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
+#             if form.is_valid():  
+                
+#                 profile = form.save(commit=False)
+#                 profile.save()
+#                 return redirect('profile') 
+            
+#     return render(request, 'edit_profile.html', {"form":form, 'profile':profile})
 # REVIEW
 
 def reviews(request):
@@ -142,19 +312,7 @@ def index(request):
         }
 	return render(request, 'index.html', params)
 
-def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            messages.success(request, f'Your account has been created! You are now able to log in {username}.')
-            return redirect('login')
-    else:
-        form = UserRegisterForm()
-    return render(request, 'registration/register.html', {'form': form}) 
+
 
 def cart(request):
 	data = cartData(request)
@@ -237,3 +395,33 @@ def processOrder(request):
 		)
 
 	return JsonResponse('Payment submitted..', safe=False)
+
+
+# like a book
+@customer_required(login_url='login')
+@author_required(login_url = 'login')
+@institution_required(login_url = 'login')
+def like_product(request, id):
+    likes = Likes.objects.filter(product_id=id).first()
+    # check if the user has already liked the image
+    if Likes.objects.filter(product_id=id, user_id=request.user.id).exists():
+        # unlike the image
+        likes.delete()
+        # reduce the number of likes by 1 for the image
+        product = Product.objects.get(id=id)
+        # check if the image like_count is equal to 0
+        if product.like_count == 0:
+            product.like_count = 0
+            product.save()
+        else:
+            product.like_count -= 1
+            product.save()
+        return redirect('/')
+    else:
+        likes = Likes(product_id=id, user_id=request.user.id)
+        likes.save()
+        # increase the number of likes by 1 for the image
+        product = Product.objects.get(id=id)
+        product.like_count = product.like_count + 1
+        product.save()
+        return redirect('/')

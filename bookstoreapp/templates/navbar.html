@@ -15,7 +15,31 @@
     </ul>
     <div class="form-inline my-2 my-lg-0">
       {% if user.is_authenticated%}
+          {% if user.is_author%}
         <li class="nav-item dropdown list-unstyled">
+            <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">{{ user.username|title }} <img class="rounded-circle nav-img"
+                                                                    src="{#{{ user.profile.profile_picture.url }}#}"
+                                                                    alt="">
+            </a>
+            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item text-center" href="{#{% url 'author' user.username %}#}">Profile</a>
+                <hr>
+                <a class="dropdown-item text-center" href="{#{% url 'edit' user.username  %}#}"> Edit profile</a>
+                <hr>
+                <a href="{% url 'logout' %}" class="text-secondary text-center dropdown-item">Log Out</a>
+
+
+            </div> 
+        </li>
+        <span>
+          <button class="btn btn-outline-light btn-sm" id="site" data-toggle="modal" data-target=".bd-example-modal-xl">
+            POST YOUR BOOK
+        </button>
+        </span>
+          {% elif user.is_customer%}
+          <li class="nav-item dropdown list-unstyled">
             <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false">{{ user.username|title }} <img class="rounded-circle nav-img"
@@ -32,11 +56,27 @@
 
             </div> 
         </li>
-        <span>
-          <button class="btn btn-outline-light btn-sm" id="site" data-toggle="modal" data-target=".bd-example-modal-xl">
-            POST YOUR BOOK
-        </button>
-        </span>
+
+          {% else %}
+          <li class="nav-item dropdown list-unstyled">
+            <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false">{{ user.username|title }} <img class="rounded-circle nav-img"
+                                                                    src="{#{{ user.profile.profile_picture.url }}#}"
+                                                                    alt="">
+            </a>
+            <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item text-center" href="{#{% url 'institution' user.username %}#}">Profile</a>
+                <hr>
+                <a class="dropdown-item text-center" href="{#{% url 'edit' user.username  %}#}"> Edit profile</a>
+                <hr>
+                <a href="{% url 'logout' %}" class="text-secondary text-center dropdown-item">Log Out</a>
+
+
+            </div> 
+        </li>
+        {% endif %}
+
         {% else %}
         <a href="{% url 'login' %}"class="btn btn-light">Login</a>
 
