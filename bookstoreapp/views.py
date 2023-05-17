@@ -36,6 +36,28 @@ def signup(request):
     title = 'Sign Up'
     return render(request,'registration/signup.html',{'title': title})
 
+
+
+
+def author_signup(request):
+    if request.method == 'POST':
+        form = AuthorSignUpForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            username = form.cleaned_data.get('username')
+            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+            subject = 'Welcome to the Zen Bookstore!'
+            message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nFeel free to advertise and sell your books with us!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            email_from = settings.EMAIL_HOST_USER
+            recepient_list = [user.email]
+            send_mail(subject,message,email_from,recepient_list)
+            messages.success(request, f'Your account has been created! You are now able to log in as {username}.')
+            return redirect('login')
+    else:
+        form = AuthorSignUpForm()
+        
+    return render(request, 'registration/register.html', {'form':form}) #check template
+
 #customer signup
 def customer_signup(request):
     '''View function to sign up as a customer'''
@@ -45,70 +67,39 @@ def customer_signup(request):
         if form.is_valid():
             user=form.save()
             username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password')
-            email = form.cleaned_data['email']
-            # user = authenticate(username=username, email= email, password=raw_password)
             login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            
-            # subject = 'Welcome to the Zen Bookstore!'
-            # message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nRemember to enjoy the app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            # email_from = settings.EMAIL_HOST_USER
-            # recepient_list = [user.email]
-            # send_mail(subject,message,email_from,recepient_list)
-            messages.success(request, 'Account created successfully! Check your email for a welcome mail.')
+            subject = 'Welcome to the Zen Bookstore!'
+            message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nRemember to enjoy the app and purchase a book!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            email_from = settings.EMAIL_HOST_USER
+            recepient_list = [user.email]
+            send_mail(subject,message,email_from,recepient_list)
+            messages.success(request, f'Account created successfully! Check your email for a welcome mail. You are now able to log in as {username}.')
 
-            return redirect('/login')
+            return redirect('login')
     else:
         form= CustomerSignUpForm()
 
     # title = 'Welcome, we hold you in high esteem'
-    return render(request,'registration/signup_form.html',{'form':form}) #change template
-
-
-def author_signup(request):
-    if request.method == 'POST':
-        form = AuthorSignUpForm(request.POST)
-        if form.is_valid():
-            user=form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            email = form.cleaned_data['email']
-            # user = authenticate(username=username,email=email, password=raw_password)
-            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            # subject = 'Welcome to the Zen Bookstore!'
-            # message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nFeel free to sell your books with us!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            # email_from = settings.EMAIL_HOST_USER
-            # recepient_list = [user.email]
-            # send_mail(subject,message,email_from,recepient_list)
-            messages.success(request, f'Your account has been created! You are now able to log in as {username}.')
-            return redirect('login')
-    else:
-        form = AuthorSignUpForm()
-        
-    return render(request, 'registration/register.html', {'form':form}) #check template
-
-
+    return render(request,'registration/register.html',{'form':form}) #change template
 def institution_signup(request):
     if request.method == 'POST':
         form = InstitutionSignUpForm(request.POST)
         if form.is_valid():
             user=form.save()
             username = form.cleaned_data.get('username')
-            email = form.cleaned_data['email']
-            raw_password = form.cleaned_data.get('password1')
-            # user = authenticate(username=username,email=email, password=raw_password)
             login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            # subject = 'Welcome to the Zen Bookstore!'
-            # message = f'Hi {user.username},\nWe value institutions like yours and welcome you to our growing community.\nYou can purchase books in our app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            # email_from = settings.EMAIL_HOST_USER
-            # recepient_list = [user.email]
-            # send_mail(subject,message,email_from,recepient_list)
+            subject = 'Welcome to the Zen Bookstore!'
+            message = f'Hi {user.username},\nWe value institutions and we welcome you to our growing community.\nYou can purchase books from ou app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
+            email_from = settings.EMAIL_HOST_USER
+            recepient_list = [user.email]
+            send_mail(subject,message,email_from,recepient_list)
             messages.success(request, f'Your account has been created! You are now able to log in {username}.')
+            
             return redirect('login')
     else:
         form = InstitutionSignUpForm()
-        title = 'Welcome, we hold you in high esteem'
-    return render(request, 'registration/register.html', {'title': title,'form':form}) #check template
+    return render(request, 'registration/register.html', {'form':form}) #check template
+
 
 
 def login_view(request):
@@ -127,7 +118,7 @@ def login_view(request):
 		else:
 			messages.error(request,"Invalid username or password.")
 	form = LoginForm()
-	return render(request=request, template_name="login.html", context= {"form":form}) #changetemplate
+	return render(request=request, template_name="registration/login.html", context= {"form":form}) #changetemplate
 
 def logout_view(request):
     logout(request)
@@ -136,105 +127,115 @@ def logout_view(request):
 
 #profiles
 
-@customer_required(login_url = 'login')
-def customer_profile(request):
-    current_user = request.user
-    profile = Customer.objects.get(user_id=current_user.id).first()
-    return render(request, "profile.html", {"profile": profile})
+# @customer_required(login_url = 'login')
+# def customer_profile(request):
+#     current_user = request.user
+#     profile = Customer.objects.get(user_id=current_user.id).first()
+#     return render(request, "profile.html", {"profile": profile})
 
-@author_required(login_url = 'login')
-def author_profile(request):
-    current_user = request.user
-    profile = Author.objects.filter(user_id=current_user.id).first()
-    return render(request, "profile.html", {"profile": profile})
-
-
-@institution_required(login_url = 'login')
-def institution_profile(request):
-    current_user = request.user
-    profile = Institution.objects.filter(user_id=current_user.id).first()
-    return render(request, "profile.html", {"profile": profile}) #change template
+# @author_required(login_url = 'login')
+# def author_profile(request):
+#     current_user = request.user
+#     profile = Author.objects.filter(user_id=current_user.id).first()
+#     return render(request, "profile.html", {"profile": profile})
 
 
-def profile(request):  # view profile
-    current_user = request.user
-    profile = Profile.objects.filter(user_id=current_user.id).first()  # get profile
-    product = Product.objects.filter(author=current_user.author).all()  # get all projects
-    return render(request, "profile.html", {"profile": profile,"image": product})
-def update_profile(request,id):
-    user = User.objects.get(id=id)
-    profile = Profile.objects.get(user = user)
-    form = UpdateProfileForm(instance=profile)
-    if request.method == "POST":
-            form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
-            if form.is_valid():  
+# @institution_required(login_url = 'login')
+# def institution_profile(request):
+#     current_user = request.user
+#     profile = Institution.objects.filter(user_id=current_user.id).first()
+#     return render(request, "profile.html", {"profile": profile}) #change template
+
+
+# def profile(request):  # view profile
+#     current_user = request.user
+#     user = User.objects.filter(id=current_user.id).first()  # get profile
+#     # product = Product.objects.filter(author=current_user.author).all()  # get all projects
+#     profile = Profile.objects.get(id = id)
+#     form = UpdateProfileForm(instance=profile)
+#     if request.method == "POST":
+#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
+#             if form.is_valid():  
+#                 profile = form.save(commit=False)
+#                 profile.save()
+#                 return redirect('profile') 
+#     else:
+#         form = UpdateProfileForm()
+#     return render(request, "profile.html", {"user": user})
+# def update_profile(request,id):
+#     # user = User.objects.get(id=id)
+#     profile = Profile.objects.get(id = id)
+#     form = UpdateProfileForm(instance=profile)
+#     if request.method == "POST":
+#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
+#             if form.is_valid():  
                 
-                profile = form.save(commit=False)
-                profile.save()
-                return redirect('profile') 
+#                 profile = form.save(commit=False)
+#                 profile.save()
+#                 return redirect('profile') 
             
-    ctx = {"form":form}
-    return render(request, 'update_profile.html', ctx)
+#     ctx = {"form":form}
+#     return render(request, 'update_profile.html', ctx)
 
 
 
 #updating profiles
-def update_customer_profile(request):
-  if request.method == 'POST':
-    # user_form = UpdateUserProfile(request.POST,request.FILES,instance=request.user)
-    form = UpdateCustomerProfileForm(request.POST,request.FILES,instance=request.user)
-    if form.is_valid():
-    #   user_form.save()
-      form.save()
-      messages.success(request,'Your Profile account has been updated successfully')
-      return redirect('profile')
-  else:
-    # user_form = UpdateUserProfile(instance=request.user)
-    form = UpdateCustomerProfileForm(instance=request.user) 
-  params = {
-    # 'user_form':user_form,
-    'form':form
-  }
-  return render(request,'edit_profile.html',params) #change template
+# def update_customer_profile(request):
+#   if request.method == 'POST':
+#     # user_form = UpdateUserProfile(request.POST,request.FILES,instance=request.user)
+#     form = UpdateCustomerProfileForm(request.POST,request.FILES,instance=request.user)
+#     if form.is_valid():
+#     #   user_form.save()
+#       form.save()
+#       messages.success(request,'Your Profile account has been updated successfully')
+#       return redirect('profile')
+#   else:
+#     # user_form = UpdateUserProfile(instance=request.user)
+#     form = UpdateCustomerProfileForm(instance=request.user) 
+#   params = {
+#     # 'user_form':user_form,
+#     'form':form
+#   }
+#   return render(request,'edit_profile.html',params) #change template
 
 
-def update_author_profile(request):
-    if request.method == 'POST':
-        # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
-        p_form = UpdateAuthorProfileForm(request.POST, instance=request.user)
-        if p_form.is_valid():
-            # u_form.save()
-            p_form.save()
-            messages.success(
-                request, 'Your Profile account has been updated successfully')
-            return redirect('profile')
-    else:
-        # u_form = UpdateUserProfile(instance=request.user)
-        p_form = UpdateAuthorProfileForm(instance=request.user)
-    context = {
-        # 'u_form': u_form,
-        'p_form': p_form
-    }
-    return render(request,'staff_profile.html',context) #change template
+# def update_author_profile(request):
+#     if request.method == 'POST':
+#         # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
+#         p_form = UpdateAuthorProfileForm(request.POST, instance=request.user)
+#         if p_form.is_valid():
+#             # u_form.save()
+#             p_form.save()
+#             messages.success(
+#                 request, 'Your Profile account has been updated successfully')
+#             return redirect('profile')
+#     else:
+#         # u_form = UpdateUserProfile(instance=request.user)
+#         p_form = UpdateAuthorProfileForm(instance=request.user)
+#     context = {
+#         # 'u_form': u_form,
+#         'p_form': p_form
+#     }
+#     return render(request,'staff_profile.html',context) #change template
 
-def update_institution_profile(request):
-    if request.method == 'POST':
-        # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
-        p_form = UpdateInstitutionProfileForm(request.POST, instance=request.user)
-        if p_form.is_valid():
-            # u_form.save()
-            p_form.save()
-            messages.success(
-                request, 'Your Profile account has been updated successfully')
-            return redirect('profile')
-    else:
-        # u_form = UpdateUserProfile(instance=request.user)
-        p_form = UpdateInstitutionProfileForm(instance=request.user)
-    context = {
-        # 'u_form': u_form,
-        'p_form': p_form
-    }
-    return render(request,'staff_profile.html',context) #change template
+# def update_institution_profile(request):
+#     if request.method == 'POST':
+#         # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
+#         p_form = UpdateInstitutionProfileForm(request.POST, instance=request.user)
+#         if p_form.is_valid():
+#             # u_form.save()
+#             p_form.save()
+#             messages.success(
+#                 request, 'Your Profile account has been updated successfully')
+#             return redirect('profile')
+#     else:
+#         # u_form = UpdateUserProfile(instance=request.user)
+#         p_form = UpdateInstitutionProfileForm(instance=request.user)
+#     context = {
+#         # 'u_form': u_form,
+#         'p_form': p_form
+#     }
+#     return render(request,'staff_profile.html',context) #change template
 
 # @login_required
 # def update_profile(request,id):
@@ -265,7 +266,7 @@ def index(request):
 	order = data['order']
 	items = data['items']
 
-	products = Product.objects.all()
+	products = Product.objects.all().order_by('-product_date')
 	if request.method == 'POST':
 			form = ProductForm(request.POST, request.FILES)
 			if form.is_valid():

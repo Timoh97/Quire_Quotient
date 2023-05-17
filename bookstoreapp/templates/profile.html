@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
 <style>
     .card {
@@ -27,8 +28,8 @@
             <div class="col-md-3">
                 <div class="card">
 
-                    {% if user %}
-                    <img src="{{profile.profile_photo.url}}" alt="" class="card-img-top">
+                    {% if profile.profile_photo %}
+                    <img src="{{profile.profile_photo}}" alt="" class="card-img-top">
                     {%else%}
                     <img src="https://st2.depositphotos.com/1104517/11965/v/600/depositphotos_119659092-stock-illustration-male-avatar-profile-picture-vector.jpg"
                         class="card-img-top" alt="My profile picture">
@@ -40,10 +41,15 @@
                         <p>{{ user.username }}</p>
                         <p>
                            
-                        {% if profile.contact %}
-                        <small>{{ profile.contact }}</small>
+                        {% if profile.phone_no %}
+                        <small>{{ profile.phone_no }}</small>
                         {% else %}
                         <span class="badge rounded-pill bg-info text-white">No contact</span>
+                        {% endif %}
+                        {% if profile.address %}
+                        <small>{{ profile.phone_no }}</small>
+                        {% else %}
+                        <span class="badge rounded-pill bg-info text-white">No address</span>
                         {% endif %}
                         </p>
                         <p>
@@ -63,66 +69,21 @@
                         <div class="card p-2">
                             <button type="button" class="btn btn-lg m-3" data-bs-toggle="modal"
                                 data-bs-target="#profileModal">
-                                <i class="fa fa-plus text-white"></i> Update Profile
+                                <a href="" class="btn btn-default btn-rounded mb-4" data-toggle="modal" data-target="#modalContactForm">UPDATE
                             </button>
                             <div class="modal fade" id="profileModal" tabindex="-1" role="dialog"
                                 aria-labelledby="profileModalLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="profileModalLabel">Update Profile</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                        </div>
+                                            <button type="button" id="profileModal" class="btn btn-lg m-3">
+                                            <i class="fa fa-plus text-white"></i> Update Profile
+                                        </button>
                                         <div class="modal-body">
-                                            <form action="{% url 'update_profile' %}" method="POST"
+                                            <form action="" method="POST"
                                                 enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group mb-3">
-                                                            <label for="name">First Name</label>
-                                                            <input type="text" class="form-control" id="first_name"
-                                                                name="first_name" value="{{ user.first_name }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group mb-3">
-                                                            <label for="name">Last Name</label>
-                                                            <input type="text" class="form-control" id="last_name"
-                                                                name="last_name" value="{{ user.last_name }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group mb-3">
-                                                            <label for="username">Username</label>
-                                                            <input type="text" class="form-control" id="username"
-                                                                name="username" value="{{ user.username }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group mb-3">
-                                                            <label for="contact">Contact</label>
-                                                            <input type="text" class="form-control" id="contact"
-                                                                name="contact" value="{{ profile.contact }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group mb-3">
-                                                    <label for="email">Email</label>
-                                                    <input type="email" class="form-control" id="email" name="email"
-                                                        value="{{ user.email}}">
-                                                </div>
-                                                <div class="form-group mb-3">
-                                                    <label for="bio">Bio</label>
-                                                    <textarea name="bio" id="bio" cols="30" rows="10"
-                                                        class="form-control">{{ profile.bio }}</textarea>
-                                                </div>
-                                                <div class="form-group mb-3">
-                                                    <label for="profile_pic">Profile Picture</label>
-                                                    <input type="file" class="form-control" id="profile_pic"
-                                                        name="profile_pic" required>
-                                                </div>
+                                                    
+                                              
                                                 <div class="modal-footer">
                                                     <button type="submit" class="btn">Update Account</button>
                                                 </div>
@@ -165,33 +126,12 @@
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="#" method="post"
-                                            enctype="multipart/form-data">
-                                            {% csrf_token %}
-                                            <div class="form-group">
-                                                <label for="title">Title</label>
-                                                <input type="text" class="form-control" value="" name="title" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="title">Location</label>
-                                                <input type="text" class="form-control" value="" name="location" required>
-                                            </div>
-                                            <div class="form-group mt-3">
-                                                <label for="url">URL Link</label>
-                                                <input type="url" class="form-control" value="" name="url" required>
-                                            </div>
-                                            <div class="form-group mt-3">
-                                                <label for="exampleFormControlFile1">Photo</label>
-                                                <input type="file" class="form-control" id="exampleFormControlFile1"
-                                                    name="image" required>
-                                            </div>
-                                            <div class="form-group mt-3">
-                                                <label for="exampleFormControlTextarea1">Description</label>
-                                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"
-                                                    name="description" required></textarea>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="submit" class="btn">Save</button>
+                                        <form action="" method="post" novalidate>
+                                            {% csrf_token%}
+                                            {{ form|crispy}}
+                                            <div class="modal-footer d-flex justify-content-center">
+                                                <button type="submit" class="btn btn-unique">Send <i class="fas fa-paper-plane-o ml-1"></i></button>
+                                              </div>
                                         </form>
                                     </div>
                                 </div>
@@ -249,21 +189,44 @@
             </div>
 
         </div>
-        <!-- <div class="col-md-12 mt-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">Comments</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                </div>
 
-            </div>
-        </div> -->
     </div>
     </div>
 </section>
+
+
+<div class="card-text">
+
+    <div class="modal fade" id="modalContactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header text-center">
+          <h4 class="modal-title w-100 font-weight-bold">Update your profile</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body mx-3">
+
+
+  
+            <form action="" method="post" novalidate>
+                {% csrf_token%}
+                {{ form|crispy}}
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="submit" class="btn btn-unique">Send <i class="fas fa-paper-plane-o ml-1"></i></button>
+                  </div>
+
+            </form>
+  
+
+  
+        </div>
+
+      </div>
+    </div>
+  </div>
+  
+
 {% endblock %}

@@ -17,6 +17,7 @@ def author_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, logi
     return actual_decorator
 
 #customer decorator
+#admin login
 def customer_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
     '''
     Decorator for views that checks that the logged in user is an customer,
@@ -34,7 +35,7 @@ def customer_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, lo
 #institution login
 def institution_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url='login'):
     '''
-    Decorator for views that checks that the logged in user is an customer,
+    Decorator for views that checks that the logged in user is an institution,
     redirects to the log-in page if necessary.
     '''
     actual_decorator = user_passes_test(

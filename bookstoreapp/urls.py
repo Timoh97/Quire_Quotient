@@ -18,14 +18,14 @@ urlpatterns = [
     
     # REVIEWS
     path('reviews/', views.reviews,name="reviews"),
-    path("profile/", views.profile, name="profile"),
-    path("profile/update/<int:id>", views.update_profile, name="update_profile"),
-    path('institution/profile/', views.institution_profile, name='institution_profile'),
-    path('author/profile/', views.author_profile, name='author_profile'),
-    path('customer/profile/', views.customer_profile, name='customer_profile'),
-    path('update_author_profile/<int:id>',views.update_author_profile, name='update_author_profile'),
-    path('update_customer_profile/<int:id>',views.update_customer_profile, name='update_customer_profile'),
-    path('update_institution_profile/<int:id>',views.update_institution_profile, name='update_institution_profile'),
+    # path("profile/", views.profile, name="profile"),
+    # path("profile/update/", views.update_profile, name="update_profile"),
+    # path('institution/profile/', views.institution_profile, name='institution_profile'),
+    # path('author/profile/', views.author_profile, name='author_profile'),
+    # path('customer/profile/', views.customer_profile, name='customer_profile'),
+    # path('update_author_profile/<int:id>',views.update_author_profile, name='update_author_profile'),
+    # path('update_customer_profile/<int:id>',views.update_customer_profile, name='update_customer_profile'),
+    # path('update_institution_profile/<int:id>',views.update_institution_profile, name='update_institution_profile'),
     #ordersystem
     path('', views.index, name="index"),
     

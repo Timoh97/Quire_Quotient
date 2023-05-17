@@ -1,27 +1,45 @@
-{% extends 'registration/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>signup</title>
+</head>
+<body>
+    {%extends 'registration/base.html'%}
 {% load crispy_forms_tags %}
-{% block content %}
-<div class="container" style="margin-top:7%;">
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            <div class="card" style="margin-top:2%; padding:20px">
-                <div class="card-body">
-                    <h5 class="card-title"><a>Register</a> <span style="float:right">Already have account? <a
-                            href="{% url 'login' %}" class="text-info">Login now</a></span></h5>
-                    <div class="card-text">
-                        <form action="" method="post" novalidate>
-                            {% csrf_token%}
-                            {{ form|crispy}}
-                            <button type="submit" class="btn btn-info btn-sm"> Register</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-md-2"></div>
-    </div>
-</div>
-
+{%load static%}
+{% block styles %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/signup_form.css' %}">
 {% endblock %}
+
+{%block content%}
+<div class="bg">
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8 card-column">
+                <div class="card signup">
+                    <div class="card-body">
+                      <h5 class="card-title"><a>Sign in to continue</a> <span style="float:right">You have an account? <a
+                        href="{% url 'login' %}" class="text-info">Proceed to login</a></span></h5>
+                
+                      <form method="POST" class="form-group">
+                        <div class="form-group"></div>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-success signup-btn">Sign Up</button>
+                    </form>    
+                    </div>
+                  </div>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
+    </div>
+
+{%endblock%}
+</body>
+</html>

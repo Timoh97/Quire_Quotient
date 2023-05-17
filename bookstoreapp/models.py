@@ -15,101 +15,31 @@ class User(AbstractUser):
     is_author = models.BooleanField(default=False)
     is_customer = models.BooleanField(default=False)
     is_institution = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    email = models.EmailField(max_length=200,null=True,unique=True)
-    username = models.CharField(max_length=200,null=True, blank=False)
+    email = models.EmailField(max_length=200,unique=True)
     REQUIRED_FIELDS = []
 
     USERNAME_FIELD = 'email'
     
-    
-class Admin(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)    
-    date = models.DateTimeField(auto_now_add=True)
-
-    def save_admin(self):
-        self.save()
-        
-    def update_admin(self):
-        self.update()
-        
-    def delete_admin(self):
-        self.delete()
-        
-    def __str__(self):
-      return f'{self.user}'
   
   
 class Institution(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
-    date = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def save_institution(self):
-        self.save()
-        
-    def update_institution(self):
-        self.update()
-        
-    def delete_institution(self):
-        self.delete()
-        
-    def __str__(self):
-      return f'{self.user}'
-
-#add author table
+    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)    
 class Author(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
-
-    # username = models.CharField(max_length=200,null=True, unique=True)
-    # phone_no = models.IntegerField(blank=False, null=True)
-    # books_authored = models.CharField(max_length=200, blank=False,default = "e.g anthills of savannah", unique=True)
-    # email = models.EmailField(max_length=200,unique=True)
-    date = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def save_author(self):
-        self.save()
-        
-    def update_author(self):
-        self.update()
-        
-    def delete_author(self):
-        self.delete()
-        
-    def __str__(self):
-      return f'{self.user}'
 class Customer(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
-    # fist_name = models.CharField(max_length=200,null=True, blank=False)
-    # last_name = models.CharField(max_length=200,null=True, blank=False)
-    # username = models.CharField(max_length=200, default="", blank=False)
-    # phone_no = models.IntegerField(blank=False,null=True)
-    # email = models.EmailField(max_length=200,unique=True,null=True,)
-    date = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    def save_customer(self):
-        self.save()
-        
-    def update_customer(self):
-        self.update()
-        
-    def delete_customer(self):
-        self.delete()
-        
-    def __str__(self):
-      return f'{self.user}'
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_photo = CloudinaryField("image")
     bio = models.TextField(max_length=250, blank=True, null=True)
-    institution_address = models.CharField(max_length=200,null=True, blank=False, unique=True)
+    address = models.CharField(max_length=200,null=True, blank=False, unique=True)
     phone_no = models.IntegerField(blank=False, null=True)
-    institution_name = models.CharField(max_length=200, null=True,blank=False)
-    last_name = models.CharField(max_length=200,null=True, blank=False)
+    email = models.EmailField(max_length=200)
     first_name = models.CharField(max_length=200,null=True, blank=False)
+    last_name = models.CharField(max_length=200,null=True, blank=False)
+
+    def update(self):
+        self.save()
 
     def save_profile(self):
         self.save()
@@ -118,8 +48,8 @@ class Profile(models.Model):
         self.delete()
 
     @classmethod
-    def filter_by_id(cls, id):
-        profile = Profile.objects.filter(user=id).first()
+    def get_profile_by_user(cls, user):
+        profile = cls.objects.filter(user=user)
         return profile
 
     def __str__(self):
@@ -134,6 +64,7 @@ class Product(models.Model):
     year_published = models.IntegerField(blank=True, null=True)
     like_count = models.IntegerField(default=0)
     comment_count = models.IntegerField(default=0)
+    product_date = models.DateTimeField(auto_now_add=True)
     
     
         # get images by user
@@ -218,26 +149,19 @@ def create_user_customer(sender, instance, created, **kwargs):
 # likes model
 class Likes(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    # likes = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.product
     
 class Comments(models.Model):
-  comment = models.TextField()
-  product = models.ForeignKey(Product,default="", on_delete=models.CASCADE)
-  date = models.DateTimeField(auto_now_add=True)
-  user = models.OneToOneField(User, on_delete=models.CASCADE)
+   user = models.OneToOneField(User, on_delete=models.CASCADE)
+   comment = models.CharField(max_length=50)
+   product = models.ForeignKey(Product,default="", on_delete=models.CASCADE)
+   date = models.DateTimeField(auto_now_add=True)
   
-
-  
-  def save_user_comment(self):
+   def save_comment(self):
         self.save()
-  def update_user_comment(self):
-        self.update()
-  def delete_user_comment(self):
-        self.delete()
-  
-  def __str__(self):
-    return f'{self.user}'
+
+   def __str__(self):
+        return self.comment
