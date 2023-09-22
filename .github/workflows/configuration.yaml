@@ -3,7 +3,7 @@ name: Django CI
 on:
   push:
     branches:
-      - main  # Replace 'main' with your default branch name
+      - master  # Replace 'main' with your default branch name
 
 jobs:
   build:
