@@ -1,272 +1,46 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render, redirect
-from .forms import *
-from .models import *
-
-#AUTHENTICATION
-from django.shortcuts import render,redirect
-from django.contrib.auth import login, logout,authenticate
-from django.contrib import messages
-from django.conf import settings
-from django.core.mail import send_mail
-from .forms import *
-from. decorators import *
-from django.contrib.auth.decorators import *
-from django.contrib.auth.decorators import login_required
-
-#ordersystem
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, Http404,HttpResponseRedirect, JsonResponse
 from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.models import User
 import json
+from django.contrib.auth.decorators import login_required
+from. decorators import *
 import datetime
 from .models import *
-from .forms import *
 from .utils import cookieCart, cartData, guestOrder
+from .forms import *
+from datetime import datetime, timedelta
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.utils import timezone
+# from . safaricom import MpesaAccessToken, LipanaMpesaPpassword
+from bookstore.settings import *
+import requests
+from requests.auth import HTTPBasicAuth
 
+# Create your views here.
+def generate_otp():
+    return get_random_string(length=6, allowed_chars='0123456789')
 
-
-def signup(request):
-    '''View function to present users with account choices'''
-    title = 'Sign Up'
-    return render(request,'registration/signup.html',{'title': title})
-
-
-
-
-def author_signup(request):
-    if request.method == 'POST':
-        form = AuthorSignUpForm(request.POST)
-        if form.is_valid():
-            user=form.save()
-            username = form.cleaned_data.get('username')
-            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            subject = 'Welcome to the Zen Bookstore!'
-            message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nFeel free to advertise and sell your books with us!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            email_from = settings.EMAIL_HOST_USER
-            recepient_list = [user.email]
-            send_mail(subject,message,email_from,recepient_list)
-            messages.success(request, f'Your account has been created! You are now able to log in as {username}.')
-            return redirect('login')
-    else:
-        form = AuthorSignUpForm()
-        
-    return render(request, 'registration/register.html', {'form':form}) #check template
-
-#customer signup
-def customer_signup(request):
-    '''View function to sign up as a customer'''
+def send_otp_email(email, otp):
+    subject = 'One-Time Password'
+    message = f'Your OTP is: {otp}. It will expire in one minute.'
+    from_email = 'timohmugendi@gmail.com'  
+    send_mail(subject, message, from_email, [email])
     
-    if request.method == 'POST':
-        form = CustomerSignUpForm(request.POST)
-        if form.is_valid():
-            user=form.save()
-            username = form.cleaned_data.get('username')
-            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            subject = 'Welcome to the Zen Bookstore!'
-            message = f'Hi {user.username},\nWe officially welcome you to our growing community.\nRemember to enjoy the app and purchase a book!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            email_from = settings.EMAIL_HOST_USER
-            recepient_list = [user.email]
-            send_mail(subject,message,email_from,recepient_list)
-            messages.success(request, f'Account created successfully! Check your email for a welcome mail. You are now able to log in as {username}.')
-
-            return redirect('login')
-    else:
-        form= CustomerSignUpForm()
-
-    # title = 'Welcome, we hold you in high esteem'
-    return render(request,'registration/register.html',{'form':form}) #change template
-def institution_signup(request):
-    if request.method == 'POST':
-        form = InstitutionSignUpForm(request.POST)
-        if form.is_valid():
-            user=form.save()
-            username = form.cleaned_data.get('username')
-            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            subject = 'Welcome to the Zen Bookstore!'
-            message = f'Hi {user.username},\nWe value institutions and we welcome you to our growing community.\nYou can purchase books from ou app!\n\nKind Regards,\nThe Zen-Bookstore App Management.'
-            email_from = settings.EMAIL_HOST_USER
-            recepient_list = [user.email]
-            send_mail(subject,message,email_from,recepient_list)
-            messages.success(request, f'Your account has been created! You are now able to log in {username}.')
-            
-            return redirect('login')
-    else:
-        form = InstitutionSignUpForm()
-    return render(request, 'registration/register.html', {'form':form}) #check template
-
-
-
-def login_view(request):
-	if request.method == "POST":
-		form = LoginForm(request.POST)
-		if form.is_valid():
-			username = form.cleaned_data.get('username')
-			password = form.cleaned_data.get('password')
-			user = authenticate(username=username, password=password)
-			if user is not None:
-				login(request, user)
-				messages.info(request, f"You are now logged in as {username}.")
-				return redirect("/")
-			else:
-				messages.error(request,"Invalid username or password.")
-		else:
-			messages.error(request,"Invalid username or password.")
-	form = LoginForm()
-	return render(request=request, template_name="registration/login.html", context= {"form":form}) #changetemplate
-
-def logout_view(request):
-    logout(request)
-    return redirect('/')
-
-
-#profiles
-
-# @customer_required(login_url = 'login')
-# def customer_profile(request):
-#     current_user = request.user
-#     profile = Customer.objects.get(user_id=current_user.id).first()
-#     return render(request, "profile.html", {"profile": profile})
-
-# @author_required(login_url = 'login')
-# def author_profile(request):
-#     current_user = request.user
-#     profile = Author.objects.filter(user_id=current_user.id).first()
-#     return render(request, "profile.html", {"profile": profile})
-
-
-# @institution_required(login_url = 'login')
-# def institution_profile(request):
-#     current_user = request.user
-#     profile = Institution.objects.filter(user_id=current_user.id).first()
-#     return render(request, "profile.html", {"profile": profile}) #change template
-
-
-# def profile(request):  # view profile
-#     current_user = request.user
-#     user = User.objects.filter(id=current_user.id).first()  # get profile
-#     # product = Product.objects.filter(author=current_user.author).all()  # get all projects
-#     profile = Profile.objects.get(id = id)
-#     form = UpdateProfileForm(instance=profile)
-#     if request.method == "POST":
-#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
-#             if form.is_valid():  
-#                 profile = form.save(commit=False)
-#                 profile.save()
-#                 return redirect('profile') 
-#     else:
-#         form = UpdateProfileForm()
-#     return render(request, "profile.html", {"user": user})
-# def update_profile(request,id):
-#     # user = User.objects.get(id=id)
-#     profile = Profile.objects.get(id = id)
-#     form = UpdateProfileForm(instance=profile)
-#     if request.method == "POST":
-#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
-#             if form.is_valid():  
-                
-#                 profile = form.save(commit=False)
-#                 profile.save()
-#                 return redirect('profile') 
-            
-#     ctx = {"form":form}
-#     return render(request, 'update_profile.html', ctx)
-
-
-
-#updating profiles
-# def update_customer_profile(request):
-#   if request.method == 'POST':
-#     # user_form = UpdateUserProfile(request.POST,request.FILES,instance=request.user)
-#     form = UpdateCustomerProfileForm(request.POST,request.FILES,instance=request.user)
-#     if form.is_valid():
-#     #   user_form.save()
-#       form.save()
-#       messages.success(request,'Your Profile account has been updated successfully')
-#       return redirect('profile')
-#   else:
-#     # user_form = UpdateUserProfile(instance=request.user)
-#     form = UpdateCustomerProfileForm(instance=request.user) 
-#   params = {
-#     # 'user_form':user_form,
-#     'form':form
-#   }
-#   return render(request,'edit_profile.html',params) #change template
-
-
-# def update_author_profile(request):
-#     if request.method == 'POST':
-#         # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
-#         p_form = UpdateAuthorProfileForm(request.POST, instance=request.user)
-#         if p_form.is_valid():
-#             # u_form.save()
-#             p_form.save()
-#             messages.success(
-#                 request, 'Your Profile account has been updated successfully')
-#             return redirect('profile')
-#     else:
-#         # u_form = UpdateUserProfile(instance=request.user)
-#         p_form = UpdateAuthorProfileForm(instance=request.user)
-#     context = {
-#         # 'u_form': u_form,
-#         'p_form': p_form
-#     }
-#     return render(request,'staff_profile.html',context) #change template
-
-# def update_institution_profile(request):
-#     if request.method == 'POST':
-#         # u_form = UpdateUserProfile(request.POST, request.FILES, instance=request.user)
-#         p_form = UpdateInstitutionProfileForm(request.POST, instance=request.user)
-#         if p_form.is_valid():
-#             # u_form.save()
-#             p_form.save()
-#             messages.success(
-#                 request, 'Your Profile account has been updated successfully')
-#             return redirect('profile')
-#     else:
-#         # u_form = UpdateUserProfile(instance=request.user)
-#         p_form = UpdateInstitutionProfileForm(instance=request.user)
-#     context = {
-#         # 'u_form': u_form,
-#         'p_form': p_form
-#     }
-#     return render(request,'staff_profile.html',context) #change template
-
-# @login_required
-# def update_profile(request,id):
-#     user = User.objects.get(id=id)
-#     profile = Profile.objects.get(user_id = user)
-#     form = UpdateProfileForm(instance=profile)
-#     if request.method == "POST":
-#             form = UpdateProfileForm(request.POST,request.FILES,instance=profile)
-#             if form.is_valid():  
-                
-#                 profile = form.save(commit=False)
-#                 profile.save()
-#                 return redirect('profile') 
-            
-#     return render(request, 'edit_profile.html', {"form":form, 'profile':profile})
-# REVIEW
-
-def reviews(request):
-    products = Product.objects.all()
-   
-    return render(request,"review.html",{'products':products})
-
-#ordersystem
 def index(request):
+    
+    # author = get_object_or_404(User, zen_name=zen_name)
+    # customer = get_object_or_404(User, zen_name=zen_name)
 	data = cartData(request)
 
 	cartItems = data['cartItems']
 	order = data['order']
 	items = data['items']
 
-	products = Product.objects.all().order_by('-product_date')
+	products = Product.objects.all()
 	if request.method == 'POST':
 			form = ProductForm(request.POST, request.FILES)
 			if form.is_valid():
@@ -279,11 +53,192 @@ def index(request):
 	params = {
         'products':products,
 				'form': form, 
-        'cartItems':cartItems
+        'cartItems':cartItems,
+        # 'customer':customer,
+        # 'author':author
         }
 	return render(request, 'index.html', params)
 
+def customer_profile(request, zen_name):
+    customer_profile = get_object_or_404(Customer, user__zen_name=zen_name)
 
+    if request.method == 'POST':
+        form = CustomerProfileForm(request.POST, instance=customer_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_profile')  # Redirect to customer profile page
+
+    else:
+        form = CustomerProfileForm(instance=customer_profile)
+
+    context = {
+        'form': form,
+    }
+    return render(request,'customer_profile.html',context)
+
+def author_profile(request, zen_name):
+    author_profile = get_object_or_404(Author, user__zen_name=zen_name)
+    
+
+    if request.method == 'POST':
+        form = AuthorProfileForm(request.POST, instance=author_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('author_profile')  # Redirect to author profile page
+
+    else:
+        form = AuthorProfileForm(instance=author_profile)
+
+    context = {
+        'form': form,
+    }
+    return render(request,'author_profile.html',context)
+
+# # @login_required
+# def author_update(request, zen_name):
+#     user = get_object_or_404(User, username=zen_name, is_author=True)
+
+#     if request.method == 'POST':
+#         a_form = AuthorProfileForm(request.POST, request.FILES, instance=user)
+#         if a_form.is_valid():
+#             a_form.save()
+#             return JsonResponse({'status': 'success'})
+#         else:
+#             return JsonResponse({'status': 'error', 'errors': a_form.errors})
+#     else:
+#         a_form = AuthorProfileForm(instance=user)
+
+#     return render(request, 'author_profile.html', {'a_form': a_form})
+
+
+def rate_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.user = request.user
+            rating.product = product
+            rating.save()
+            return redirect('product_detail', product_id=product.id)
+    else:
+        form = RatingForm()
+
+    return render(request, 'rate_product.html', {'form': form, 'product': product})
+
+
+def reviews(request):
+    
+    
+    return render(request,'reviews.html')
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        user_type = request.POST.get('user_type') 
+        if form.is_valid():
+            user = form.save()
+            otp = generate_otp()
+
+            if user_type == 'Author':
+                author = getattr(user, 'author', None)
+                if author:
+                    author.otp = otp
+                    author.otp_expires_at = timezone.now() + timedelta(minutes=1)
+                    author.save()
+            elif user_type == 'Customer':
+                customer = getattr(user, 'customer', None)
+                if customer:
+                    customer.otp = otp
+                    customer.otp_expires_at = timezone.now() + timedelta(minutes=3)
+                    customer.save()
+
+            # Send OTP to the user's email
+            send_otp_email(user.email, f'Your account has been created!\nYour One-time password is: {otp}.')
+
+            # Authenticate the user
+            authenticated_user = authenticate(request, email=user.email, password=form.cleaned_data['password1'])
+            if authenticated_user and isinstance(authenticated_user, User):
+                login(request, authenticated_user)
+
+            messages.success(request, f'Your account has been created! Check your email for the OTP.')
+            return redirect('otp_verification')  # Redirect to OTP verification page
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+
+
+
+def otp_verification(request):
+    if request.method == 'POST':
+        form = OTPVerificationForm(request.POST)
+        if form.is_valid():
+            entered_otp = form.cleaned_data['otp']
+
+            # Check if the user is an Author or Customer
+            if hasattr(request.user, 'customer'):
+                user_profile = request.user.customer
+            elif hasattr(request.user, 'author'):
+                user_profile = request.user.author
+            else:
+                # Handle the case where the user doesn't have a valid profile
+                messages.error(request, 'Invalid user profile. Please contact support.')
+                return redirect('otp_verification')
+
+            # Check the OTP and expiration time
+            if (
+                user_profile.otp == entered_otp
+                and user_profile.otp_expires_at is not None
+                and user_profile.otp_expires_at > timezone.now()
+            ):
+                # Clear OTP and expiration time after successful verification
+                user_profile.otp = None
+                user_profile.otp_expires_at = None
+                user_profile.save()
+
+                messages.success(request, 'OTP verification successful. You are now logged in.')
+                return redirect('login')
+            else:
+                messages.error(request, 'Invalid OTP. Please try again.')
+    else:
+        form = OTPVerificationForm()
+
+    return render(request, 'registration/otp_verification.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+
+            # Authenticate the user
+            user = authenticate(request, email=email, password=password)
+
+            if user is not None:
+                login(request, user)
+
+               
+                if hasattr(user, 'customer'):
+                    messages.info(request, f"You are now logged in as a Customer using {email}.")
+                elif hasattr(user, 'author'):
+                    messages.info(request, f"You are now logged in as an Author using {email}.")
+                else:
+                    messages.error(request, 'Invalid user profile. Please contact support.')
+
+                return redirect('index')
+            else:
+                messages.error(request, 'Invalid email or password. Please try again.')
+    else:
+        form = LoginForm()
+
+    return render(request, 'registration/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
 
 def cart(request):
 	data = cartData(request)
@@ -313,12 +268,12 @@ def checkout(request):
         }
 	return render(request, 'checkout.html', params)
 
+@login_required
 def updateItem(request):
 	data = json.loads(request.body)
 	productId = data['productId']
 	action = data['action']
-	print('Action:', action)
-	print('Product:', productId)
+
 
 	customer = request.user.customer
 	product = Product.objects.get(id=productId)
@@ -367,32 +322,51 @@ def processOrder(request):
 
 	return JsonResponse('Payment submitted..', safe=False)
 
+def book_detail(request, book_id):
+    book = get_object_or_404(Product, id=book_id)
+    comments = Comment.objects.filter(book=book)
+    form = CommentForm()
 
-# like a book
-@customer_required(login_url='login')
-@author_required(login_url = 'login')
-@institution_required(login_url = 'login')
-def like_product(request, id):
-    likes = Likes.objects.filter(product_id=id).first()
-    # check if the user has already liked the image
-    if Likes.objects.filter(product_id=id, user_id=request.user.id).exists():
-        # unlike the image
-        likes.delete()
-        # reduce the number of likes by 1 for the image
-        product = Product.objects.get(id=id)
-        # check if the image like_count is equal to 0
-        if product.like_count == 0:
-            product.like_count = 0
-            product.save()
-        else:
-            product.like_count -= 1
-            product.save()
-        return redirect('/')
-    else:
-        likes = Likes(product_id=id, user_id=request.user.id)
-        likes.save()
-        # increase the number of likes by 1 for the image
-        product = Product.objects.get(id=id)
-        product.like_count = product.like_count + 1
-        product.save()
-        return redirect('/')
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.book = book
+            comment.save()
+            return redirect('book_detail', book_id=book.id)
+
+    return render(request, 'book_detail.html', {'book': book, 'comments': comments, 'form': form})
+
+# def getAccessToken(request):
+#     consumer_key= c2b_consumer_key #input your consumer key from the sandbox  
+#     consumer_secret  = c2b_consumer_secret #input your consumer secret from the sandbox
+#     api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+
+#     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+
+#     mpesa_access_token = r.json()
+#     validated_mpesa_access_token = mpesa_access_token['access_token']
+    
+#     return HttpResponse(validated_mpesa_access_token)
+
+# def lipa_na_mpesa_online(request):
+#     access_token = MpesaAccessToken.validated_mpesa_access_token
+#     api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+#     headers = {"Authorization": "Bearer %s" % access_token}
+#     request = {
+#         "BusinessShortCode": LipanaMpesaPpassword.Business_short_code,
+#         "Password": LipanaMpesaPpassword.decode_password,
+#         "Timestamp": LipanaMpesaPpassword.lipa_time,
+#         "TransactionType": "CustomerPayBillOnline",
+#         "Amount": 1,
+#         "PartyA": 254714919899,  # replace with your phone number to get stk push
+#         "PartyB": LipanaMpesaPpassword.Business_short_code,
+#         "PhoneNumber": 254722991833,  # replace with your phone number to get stk push
+#         "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
+#         "AccountReference": "hacker",
+#         "TransactionDesc": "Testing stk push"
+#     }
+#     response = requests.post(api_url, json=request, headers=headers)
+    
+#     return HttpResponse(response)

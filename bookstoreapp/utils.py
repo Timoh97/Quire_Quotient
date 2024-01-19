@@ -1,5 +1,7 @@
 import json
 from .models import *
+from django.core.exceptions import ObjectDoesNotExist
+
 
 def cookieCart(request):
 	try:
@@ -40,18 +42,31 @@ def cookieCart(request):
 	return {'cartItems':cartItems ,'order':order, 'items':items}
 
 def cartData(request):
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		items = order.orderitem_set.all()
-		cartItems = order.get_cart_items
-	else:
-		cookieData = cookieCart(request)
-		cartItems = cookieData['cartItems']
-		order = cookieData['order']
-		items = cookieData['items']
+    try:
+        customer = None
+        if request.user.is_authenticated:
+            try:
+                customer = request.user.customer
+            except ObjectDoesNotExist:
+                # Handle the case where the user does not have a related customer
+                pass
 
-	return {'cartItems':cartItems ,'order':order, 'items':items}
+        if customer:
+            order, created = Order.objects.get_or_create(customer=customer, complete=False)
+            items = order.orderitem_set.all()
+            cartItems = order.get_cart_items
+        else:
+            cookieData = cookieCart(request)
+            cartItems = cookieData['cartItems']
+            order = cookieData['order']
+            items = cookieData['items']
+    except ObjectDoesNotExist:
+        # Handle other possible ObjectDoesNotExist exceptions if needed
+        cartItems = []
+        order = None
+        items = []
+
+    return {'cartItems': cartItems, 'order': order, 'items': items}
 
 	
 def guestOrder(request, data):

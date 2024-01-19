@@ -12,35 +12,23 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import pytz
+
+
+
 
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from decouple import config,Csv
+from django.template.context_processors import request
+
+
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9g-hv0%ehup=y#t-73_x#l^o@zu98kwev+(j@^o_6r^tl1v^@8'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG')
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,12 +36,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
     'bookstoreapp',
     'bootstrap4',
     'cloudinary',
     'crispy_forms',
     'crispy_bootstrap4',
     'bootstrap_modal_forms',
+    'star_ratings',
+    'password_reset',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'bookstore.urls'
@@ -84,46 +76,47 @@ TEMPLATES = [
         },
     },
 ]
-
-# WSGI_APPLICATION = 'bookstore.wsgi.application'
+STAR_RATINGS_RERATE_SAME_DELETE = True
+STAR_RATINGS_RERATE = True
+STAR_RATINGS_CLEARABLE = True
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bookstoreapp',
-        'USER': 'tim',
-    'PASSWORD':'P@ssword',
-    }
-}
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql_psycopg2',
+           'NAME': config('DB_NAME'),
+           'USER': config('DB_USER'),
+           'PASSWORD': config('DB_PASSWORD'),
+           'HOST': config('DB_HOST'),
+           'PORT': '',
+           
+       }
+       
+   }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS=True
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER='timohmugendi@gmail.com'
-EMAIL_HOST_PASSWORD='zmlbcrimmsmitlsc'
+cloudinary.config(
+    cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+    api_key=config('CLOUDINARY_API_KEY'),
+    api_secret=config('CLOUDINARY_API_SECRET'),
+    secure=True
+)
 
-#Email Configuration
+EMAIL_BACKEND =config('EMAIL_BACKEND')
+EMAIL_USE_TLS=config('EMAIL_USE_TLS')
+EMAIL_HOST=config('EMAIL_HOST')
+EMAIL_PORT=config('EMAIL_PORT')
+EMAIL_HOST_USER=config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "email"
 
-
-
+c2b_consumer_key = config("C2B_CONSUMER_KEY")
+c2b_consumer_secret = config("C2B_CONSUMER_SECRET")
+security_credential =config("SECURITY_CREDENTIAL")
+passKey = config("PASSKEY")
 # db_from_env = dj_database_url.config(conn_max_age=500)
 # DATABASES['default'].update(db_from_env)
 
 ALLOWED_HOSTS = ['*']
-
-
-cloudinary.config(
-    cloud_name='dq4bcn8d2',
-    api_key='941563347348349', 
-    api_secret='7lOtGNkeYJ_zKGF92-O1hWxcY-k',
-)
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -178,14 +171,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -201,18 +188,18 @@ REST_FRAMEWORK = {
     )
 }
 
-# LOGIN_REDIRECT_URL = 'index'
 
-# LOGOUT_REDIRECT_URL = 'index'
 LOGIN_URL = 'login'
 
 LOGOUT_URL = 'logout'
 
-LOGIN_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'index'
 
 LOGOUT_REDIRECT_URL = '/'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'bookstoreapp.backends.CustomEmailBackend',
     # 'social_core.backends.open_id.OpenIdAuth',
     # 'social_core.backends.google.GoogleOpenId',
     # 'social_core.backends.google.GoogleOAuth2',
@@ -224,3 +211,5 @@ AUTHENTICATION_BACKENDS = [
 
 # Configure Django App for Heroku.
 # django_heroku.settings(locals())
+
+# LOGIN_REDIRECT_URL = '/tutorials'

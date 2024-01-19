@@ -1,0 +1,16 @@
+<!-- rate_product.html -->
+
+<h2>Rate {{ product.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Rating</button>
+</form>
+
+<h2>Ratings</h2>
+{% for rating in product.rating_set.all %}
+    <p>User: {{ rating.user.username }}</p>
+    <p>Rating: {{ rating.rating }}/5</p>
+    <p>Created At: {{ rating.created_at }}</p>
+    <hr>
+{% endfor %}

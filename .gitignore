@@ -17,6 +17,7 @@ lib/
 lib64/
 parts/
 sdist/
+.env
 var/
 wheels/
 virtual/
