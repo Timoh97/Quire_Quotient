@@ -29,13 +29,11 @@ def generate_otp():
 def send_otp_email(email, otp):
     subject = 'One-Time Password'
     message = f'Your OTP is: {otp}. It will expire in one minute.'
-    from_email = 'timohmugendi@gmail.com'  
+    from_email=EMAIL_SENDER  
     send_mail(subject, message, from_email, [email])
     
 def index(request):
     
-    # author = get_object_or_404(User, zen_name=zen_name)
-    # customer = get_object_or_404(User, zen_name=zen_name)
 	data = cartData(request)
 
 	cartItems = data['cartItems']

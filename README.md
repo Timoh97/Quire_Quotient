@@ -5,14 +5,14 @@ Quire_Quotient
 Welcome to Quire_Quotient, an innovative online bookstore that brings authors and readers together in a seamless literary experience. 📚✨
 
 ## DESIGN
-Our design practice offers a full range of services including brand strategy, interaction and visual design and user experience testing.
+- Our design practice offers a full range of services including brand strategy, interaction and visual design and user experience testing.
 
-Throughout the project, our designers create and implement visual design and workflows, solicit user feedback and work with you to make sure what gets built is what is needed.
+- Throughout the project, our designers create and implement visual design and workflows, solicit user feedback and work with you to make sure what gets built is what is needed.
 
 ## PRODUCT MANAGEMENT
-Planning and development is iterative. Because we are constantly coding and testing, the products we build are always ready to go live. 
+- Planning and development is iterative. Because we are constantly coding and testing, the products we build are always ready to go live. 
 
-This iterative process allows for changes as business requirements evolve.
+- This iterative process allows for changes as business requirements evolve.
 
 ## DEVELOPMENT
 We are qualified Engineers,fluent in the latest enterprise and web development technologies.
@@ -32,25 +32,25 @@ We collaborate with the team to write, and improve code on a daily basis, using 
 Quire_Quotient is an open-source project, and I welcome contributions from the community. Whether you're a developer, designer, or avid reader, your input is valued. Join me in shaping the future of online literary spaces!
 
 ## PREREQUISITES
-Python3
+- Python3
 
-Virtual Environment
+- Virtual Environment
 
-django
+- Django
 
 ## TECHNOLOGIES AND LANGUAGES
 
-Version control - git 
+- Version control - git 
 
-Python3
+- Python3
 
-Django
+- Django
 
-Css 
+- CSS
 
-Bootstrap
+- Bootstrap
 
-HTML
+- HTML
 
 ## PREVIEW
 
