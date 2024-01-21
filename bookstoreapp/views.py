@@ -15,11 +15,13 @@ from datetime import datetime, timedelta
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.utils import timezone
-# from . safaricom import MpesaAccessToken, LipanaMpesaPpassword
+from . safaricom_credentials import MpesaAccessToken, LipanaMpesaPpassword
 from bookstore.settings import *
 import requests
 from requests.auth import HTTPBasicAuth
+from django_daraja.mpesa.core import MpesaClient
 
+cl = MpesaClient()
 # Create your views here.
 def generate_otp():
     return get_random_string(length=6, allowed_chars='0123456789')
@@ -338,35 +340,71 @@ def book_detail(request, book_id):
 
     return render(request, 'book_detail.html', {'book': book, 'comments': comments, 'form': form})
 
-# def getAccessToken(request):
-#     consumer_key= c2b_consumer_key #input your consumer key from the sandbox  
-#     consumer_secret  = c2b_consumer_secret #input your consumer secret from the sandbox
-#     api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+def getAccessToken(request):
+    consumer_key= c2b_consumer_key #input your consumer key from the sandbox  
+    consumer_secret  = c2b_consumer_secret #input your consumer secret from the sandbox
+    api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
-#     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+    r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
 
-#     mpesa_access_token = r.json()
-#     validated_mpesa_access_token = mpesa_access_token['access_token']
+    mpesa_access_token = r.json()
+    validated_mpesa_access_token = mpesa_access_token['access_token']
     
-#     return HttpResponse(validated_mpesa_access_token)
+    return HttpResponse(validated_mpesa_access_token)
 
-# def lipa_na_mpesa_online(request):
-#     access_token = MpesaAccessToken.validated_mpesa_access_token
-#     api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-#     headers = {"Authorization": "Bearer %s" % access_token}
-#     request = {
-#         "BusinessShortCode": LipanaMpesaPpassword.Business_short_code,
-#         "Password": LipanaMpesaPpassword.decode_password,
-#         "Timestamp": LipanaMpesaPpassword.lipa_time,
-#         "TransactionType": "CustomerPayBillOnline",
-#         "Amount": 1,
-#         "PartyA": 254714919899,  # replace with your phone number to get stk push
-#         "PartyB": LipanaMpesaPpassword.Business_short_code,
-#         "PhoneNumber": 254722991833,  # replace with your phone number to get stk push
-#         "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
-#         "AccountReference": "hacker",
-#         "TransactionDesc": "Testing stk push"
-#     }
-#     response = requests.post(api_url, json=request, headers=headers)
+def stk_push_success(request, ph_number, totalAmount):
+    # Access the phone_number value from the submitted form data
+    access_token = MpesaAccessToken.validated_mpesa_access_token
+    stk_push_callback_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    print(access_token)
+    headers = {"Authorization": "Bearer %s" % access_token}
+
+    phone_number = ph_number
+    amount = totalAmount
+    request_load = {
+        "BusinessShortCode": LipanaMpesaPpassword.Business_short_code,
+        "Password": LipanaMpesaPpassword.decode_password,
+        "Timestamp": LipanaMpesaPpassword.lipa_time,
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": amount,
+        "PartyA": 254714919899,  # replace with your phone number to get stk push
+        "PartyB": LipanaMpesaPpassword.Business_short_code,
+        "PhoneNumber": phone_number,  # replace with your phone number to get stk push
+        "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
+        "AccountReference": "hacker",
+        "TransactionDesc": "Testing stk push"
+    }
+
+    # Assuming MpesaClient is instantiated with the necessary configurations
+    cl = MpesaClient()
+
+    # Adjust the method signature based on MpesaClient implementation
+    response = cl.stk_push(phone_number, amount, stk_push_callback_url ,headers=headers, json=request_load)
+    return HttpResponse(response)
+
+def payment(request):
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number')
+        amount = request.POST.get('amount')
+
+        ph_number = None
+        totalAmount = int(float(amount))
+
+        if phone_number[0] == '0':
+            ph_number = '254' + phone_number[1:]
+        elif phone_number[0:2] == '254':
+            ph_number = phone_number
+        else:
+            return redirect(request.get_full_path())
+
+        stk_push_success(request, ph_number, totalAmount)
     
-#     return HttpResponse(response)
+        tel_nummer= phone_number
+        money=amount
+
+        return render(request, 'success.html',{'phone_number': tel_nummer, 'amount': money})
+
+
+
+
+    return render(request,'checkout.html')

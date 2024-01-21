@@ -47,7 +47,7 @@
 				<!-- <button id="make-payment">Make payment</button> -->
 				<div id="paypal-button-container"></div>
 			</div>
-			<form action="" method="post">
+			<form action="{% url 'payment' %}" method="post">
 				{% csrf_token %}
 				<div class="col-md-5">
 
@@ -59,17 +59,17 @@
 					
 					
 
-					<input style="border-radius: 0;display: none;" name='amount' class="form-control"
+					<!-- <input style="border-radius: 0;display: none;" name='amount' class="form-control"
 						type="text" required id="example-total-input"
 						>
 					
 					<input style="border-radius: 0;display: none;" name='amount' class="form-control"
 						type="text" required id="example-total-input" 
-						>
+						> -->
 
 					
-					<input style="border-radius: 0;display: none;" name='amount' class="form-control"
-						type="text" required id="example-total-input" >
+					<input style="border-radius: 0;" name='amount' class="form-control"
+						type="text" value = {{order.get_cart_total|floatformat:2}} readonly>
 				
 				</div>
 				<h1 class="mb-4">Lipa Na M-pesa</h1>
@@ -79,7 +79,7 @@
 					<div class="col-md-3">
 						<input
 							style="border-radius: 5px;background-color: rgb(255, 255, 255);color: rgb(0, 0, 0);"
-							name='phone_number' class="form-control" type="tel" placeholder="M-pesa No." value = {{order.get_cart_total|floatformat:2}} readonly>
+							name='phone_number' class="form-control" type="tel" placeholder="M-pesa No.">
 							
 					</div><br>
 					<div class="col-md-12 mt-3">

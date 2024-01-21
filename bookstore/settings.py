@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'star_ratings',
     'password_reset',
+    'django_daraja',
 ]
 
 MIDDLEWARE = [

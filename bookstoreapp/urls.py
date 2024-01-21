@@ -57,6 +57,9 @@ urlpatterns = [
     path('book/<int:book_id>/', views.book_detail, name='book_detail'),
     # path('customer_update/<str:zen_name>/', views.customer_update, name='customer_update'),
     # path('author_update/<str:zen_name>/', views.author_update, name='author_update'),
+    path('access/token/', views.getAccessToken, name='get_mpesa_access_token'),
+    path('online/lipa/', views.stk_push_success, name='lipa_na_mpesa'),
+    path('payment/', views.payment, name='payment'),
     
      # Password reset URLs
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),

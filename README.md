@@ -33,6 +33,15 @@ Bootstrap
 
 HTML
 
+## PREVIEW
+
+![Books Page]()
+
+![Cart Total]()
+
+![Checkout Page]()
+
+
 ## INSTALLATION AND SET UP
 
 Git clone the repository at git@github.com:Timoh97/BOOKSTORE.git
@@ -66,4 +75,4 @@ python manage.py server
 ## LIVE LINK
 
  ## LICENSE AND COPYRIGHT
-[MIT License] **Timothy Mugendi**,**Joy Wambui** ,**Victoria Akoth** ,**Brian Cheruiyot** ,**Rhonajoy koome** ,**Ali Hassan** ,**Annalis Kirwa** **2021**
+[MIT License] **Timothy Mugendi** **2021**
