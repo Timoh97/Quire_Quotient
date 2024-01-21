@@ -75,4 +75,6 @@ python manage.py server
 ## LIVE LINK
 
  ## LICENSE AND COPYRIGHT
-[MIT LICENSE](https://github.com/Timoh97/Quire_Quotient/blob/master/LICENSE) **Timothy Mugendi** **2021**
+ <a href="https://github.com/Timoh97/Quire_Quotient/blob/master/LICENSE" target="_blank">MIT LICENSE</a>
+ 
+  **Timothy Mugendi** **2021**
