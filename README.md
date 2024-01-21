@@ -56,7 +56,7 @@ Quire_Quotient is an open-source project, and I welcome contributions from the c
 
 ![Books Page](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/Home.jpg)
 
-![Cart Total](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/cart.jpg)
+![Cart Total](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/cartt.jpg)
 
 ![Checkout Page](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/checkout.jpg)
 
