@@ -1,5 +1,5 @@
 # NAME OF THE PROJECT
-BOOKSTORE
+Quire_Quotient
 # DESCRIPTION
 This is a software development project that allows authors to create accounts, and post the books they have authored. The readers can then purchase them online and get to read.
 ## DESIGN
@@ -44,7 +44,7 @@ HTML
 
 ## INSTALLATION AND SET UP
 
-Git clone the repository at git@github.com:Timoh97/BOOKSTORE.git
+Git clone the repository at https://github.com/Timoh97/Quire_Quotient.git
 
 
 #### CREATION AND ACTIVATION OF VIRTUAL ENVIRONMENT
