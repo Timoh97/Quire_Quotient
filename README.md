@@ -35,11 +35,11 @@ HTML
 
 ## PREVIEW
 
-![Books Page]()
+![Books Page](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/Home.jpg)
 
-![Cart Total]()
+![Cart Total](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/cart.jpg)
 
-![Checkout Page]()
+![Checkout Page](https://github.com/Timoh97/Quire_Quotient/blob/master/static/Images/checkout.jpg)
 
 
 ## INSTALLATION AND SET UP
