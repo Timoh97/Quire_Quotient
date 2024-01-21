@@ -1,0 +1,60 @@
+name: Django CI
+
+on:
+  push:
+    branches:
+      - master  # Replace 'main' with your default branch name
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8  # Use the desired Python version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up PostgreSQL
+      uses: postgresql/actions/setup-postgresql@v2
+      with:
+        postgresql-version: '13'  # Use the desired PostgreSQL version
+
+    - name: Create PostgreSQL database
+      run: |
+        psql -U postgres -c "CREATE DATABASE mydatabase;"
+
+    - name: Run Django migrations
+      run: |
+        python manage.py migrate
+
+    - name: Run Django tests
+      run: |
+        python manage.py test
+
+    - name: Generate test coverage report
+      run: |
+        coverage run manage.py test
+        coverage xml
+
+    - name: Upload test coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}  # Add your Codecov token as a secret in your repository
+
+    - name: Clean up PostgreSQL database
+      run: |
+        psql -U postgres -c "DROP DATABASE mydatabase;"
+
+    - name: Clean up Python environment
+      run: |
+        pip uninstall -y -r requirements.txt
